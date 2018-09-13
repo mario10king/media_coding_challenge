@@ -2,15 +2,15 @@ require 'uri'
 require 'net/http'
 
 class MediaController < ApplicationController
-  def shows
+  def show
     id = params[:id]
     query_string  = "/tv/#{id}?"
     puts call_api(query_string)
   end
 
-  def movies 
+  def movie 
     id = params[:id]
-    query_string  = "/movies/#{id}?"
+    query_string  = "/movie/#{id}?"
     puts call_api(query_string)
   end
 

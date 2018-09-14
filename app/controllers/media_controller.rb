@@ -5,39 +5,31 @@ class MediaController < ApplicationController
   def show
     id = params[:id]
     query_string  = "/tv/#{id}?"
-    response = call_api(query_string)
-
-    if response.code != "404"
-      render json: format(response.read_body)
-    else
-      render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
-    end
+    respond(query_string)
   end
 
   def movie 
     id = params[:id]
     query_string  = "/movie/#{id}?"
-    response = call_api(query_string)
- 
-    if response.code != "404"
-      render json: format(response.read_body)
-    else
-      render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
-    end
+    respond(query_string)
   end
 
   def search
     query = params[:query]
     page = params[:page]
-    if page
-      query_string  = "/search/multi?query=#{query}&page=#{page}"
-    else
-      query_string  = "/search/multi?query=#{query}"
-    end
+    query_string = page ? "/search/multi?query=#{query}&page=#{page}" : "/search/multi?query=#{query}"
+    respond(query_string, "search")
+  end
+
+  private
+
+  def respond(query_string, media = "")
     response = call_api(query_string)
-    
-    if response.code != "404"
+
+    if response.code != "404" && media == "search"
       render json: format_search(response.read_body)
+    elsif response.code != "404" 
+      render json: format(response.read_body)
     else
       render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
     end

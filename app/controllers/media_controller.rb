@@ -20,7 +20,12 @@ class MediaController < ApplicationController
 
   def search
     query = params[:query]
-    query_string  = "/search/multi?query=#{query}"
+    page = params[:page]
+    if page
+      query_string  = "/search/multi?query=#{query}&page=#{page}"
+    else
+      query_string  = "/search/multi?query=#{query}"
+    end
     response = call_api(query_string)
 
     render json: format_search(response) 
@@ -51,6 +56,20 @@ class MediaController < ApplicationController
   end
   
   def format_search(response)
+    response = JSON.parse(response)
+    results = []
+    response["results"].each do |media_info|
+      type = media_info["media_type"]
+      if type == 'person'
+        next
+      end
+      release = media_info["first_air_date"] || media_info["release_date"]
+      title = media_info["name"] || media_info["title"]
+      synopsis = media_info["overview"]
 
+      results << {title: title, release: release, synopsis: synopsis, type: type}
+    end
+
+    {media: results}.to_json
   end
 end

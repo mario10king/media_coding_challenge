@@ -7,7 +7,11 @@ class MediaController < ApplicationController
     query_string  = "/tv/#{id}?"
     response = call_api(query_string)
 
-    render json: format(response)
+    if response.code != "404"
+      render json: format(response.read_body)
+    else
+      render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
+    end
   end
 
   def movie 
@@ -15,7 +19,11 @@ class MediaController < ApplicationController
     query_string  = "/movie/#{id}?"
     response = call_api(query_string)
  
-    render json: format(response)
+    if response.code != "404"
+      render json: format(response.read_body)
+    else
+      render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
+    end
   end
 
   def search
@@ -27,8 +35,12 @@ class MediaController < ApplicationController
       query_string  = "/search/multi?query=#{query}"
     end
     response = call_api(query_string)
-
-    render json: format_search(response) 
+    
+    if response.code != "404"
+      render json: format_search(response.read_body)
+    else
+      render status: 404, json: {"error_message": JSON.parse(response.read_body)["status_message"]}.to_json
+    end
   end
 
   def call_api(query_string)
@@ -42,8 +54,7 @@ class MediaController < ApplicationController
     request = Net::HTTP::Get.new(url)
     request.body = "{}"
 
-    response = http.request(request)
-    response.read_body
+    http.request(request)
   end
 
   def format(response)

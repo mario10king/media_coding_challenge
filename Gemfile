@@ -49,3 +49,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "webmock", "~> 3.4"
+
+gem "rubocop", "~> 0.59.0"
